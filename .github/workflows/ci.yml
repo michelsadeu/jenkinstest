@@ -49,7 +49,17 @@ jobs:
       id: composit-id
       uses: michelsadeu/compositeaction@v1.0.0
       with: 
-        INPUT_VARIABLE: "Mon code"  
+        INPUT_VARIABLE: "Mon code" 
+    - name: Add file html
+      id: htfile
+      run: |
+        summary="fichier.html"
+        echo "Empty file" >> $summary
+        echo "Emptyone oui chef" >> $summary 
+        echo "sumval=$summary" >> $GITHUB_OUTPUT
+    - name: Afficher le fichier
+      run: |
+        cat ${{ steps.htfile.outputs.sumval }}
     
     # - name: Validate PR checkboxes
     #   id: checkboxes
