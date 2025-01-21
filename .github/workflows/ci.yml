@@ -59,7 +59,7 @@ jobs:
         echo "sumval=$summary" >> $GITHUB_OUTPUT
     - name: Afficher le fichier
       run: |
-        cat ${{ steps.htfile.outputs.sumval }}
+        echo "Hello file <br> $(cat ${{ steps.htfile.outputs.sumval }})<br> Developper"
     
     # - name: Validate PR checkboxes
     #   id: checkboxes
