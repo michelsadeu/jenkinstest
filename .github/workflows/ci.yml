@@ -126,7 +126,7 @@ jobs:
     - name: Valider les cases cochées dans la description de la PR
       id: validate  
       run: |
-        PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PATH}")
+        {PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PATH}")
         
         echo $PR_BODY
         if echo "$PR_BODY" | grep -q '\- \[x\] Mon code'; then
@@ -137,7 +137,11 @@ jobs:
         fi
         echo "pr-body<<EOF" >> $GITHUB_OUTPUT
         echo "$PR_BODY" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT 
+        
+        } || {
+          echo "Bloc catch : Gestion de l'erreur."
+        }
         
         
     - name: Valider la description de la PR
@@ -145,7 +149,7 @@ jobs:
         echo "The PR Body is:"
         echo "${{ steps.validate.outputs.pr-body }}"
         
-        if [[ "${{ steps.validate.outputs.pr-body }}" == *"Emptyone"* ]]; then
+        {if [[ "${{ steps.validate.outputs.pr-body }}" == *"Emptyone"* ]]; then
           echo "The text 'Empty' exists in the PR body."
           exit 1
           
@@ -153,10 +157,9 @@ jobs:
           echo "The text 'Empty file' does not exist in the PR body."
           
         fi
-    - name: Catcher l'erreur
-      if: failure()  # Cette étape s'exécute seulement si la précédente a échoué
-      run: |
-        echo "Une erreur a été capturée dans l'étape précédente !"
+        } || {
+          echo "Bloc catch : Gestion de l'erreur."
+        }
     - name: Cache node modules
       uses: actions/cache@v3
       env:
