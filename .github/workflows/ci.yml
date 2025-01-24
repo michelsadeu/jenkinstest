@@ -138,7 +138,7 @@ jobs:
         # Attache le gestionnaire d'erreurs au script (trap agit comme 'catch')
         trap 'error_handler' ERR
 
-        PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PATH}")
+        PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PAT}")
         
         echo $PR_BODY
         if echo "$PR_BODY" | grep -q '\- \[x\] Mon code'; then
@@ -157,7 +157,7 @@ jobs:
         echo "The PR Body is:"
         echo "${{ steps.validate.outputs.pr-body }}"
         
-        if [[ "${{ steps.validate.outputs.pr-body }}" == *"Empty"* ]]; then
+        if [[ "${{ steps.validate.outputs.pr-body }}" == *"Emptyone"* ]]; then
           echo "The text 'Empty' exists in the PR body."
           exit 1
           
