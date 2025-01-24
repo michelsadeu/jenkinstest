@@ -126,11 +126,12 @@ jobs:
     - name: Valider les cases cochées dans la description de la PR
       id: validate  
       run: |
-        PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PATH}")
         
-        echo $PR_BODY
         {
           try {
+            PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PATH}")
+        
+            echo $PR_BODY
             if echo "$PR_BODY" | grep -q '\- \[x\] Mon code'; then
               echo "✅ All required checkboxes are checked!" 
             else
