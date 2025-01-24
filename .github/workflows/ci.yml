@@ -126,18 +126,20 @@ jobs:
     - name: Valider les cases cochées dans la description de la PR
       id: validate  
       run: |
-        {PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PATH}")
+        {
         
-        echo $PR_BODY
-        if echo "$PR_BODY" | grep -q '\- \[x\] Mon code'; then
-          echo "✅ All required checkboxes are checked!" 
-        else
-          echo "Erreur : Certaines cases de la checklist ne sont pas cochées."
-          exit 1 
-        fi
-        echo "pr-body<<EOF" >> $GITHUB_OUTPUT
-        echo "$PR_BODY" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT 
+          PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PATH}")
+          
+          echo $PR_BODY
+          if echo "$PR_BODY" | grep -q '\- \[x\] Mon code'; then
+            echo "✅ All required checkboxes are checked!" 
+          else
+            echo "Erreur : Certaines cases de la checklist ne sont pas cochées."
+            exit 1 
+          fi
+          echo "pr-body<<EOF" >> $GITHUB_OUTPUT
+          echo "$PR_BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT 
         
         } || {
           echo "Bloc catch : Gestion de l'erreur."
@@ -149,14 +151,16 @@ jobs:
         echo "The PR Body is:"
         echo "${{ steps.validate.outputs.pr-body }}"
         
-        {if [[ "${{ steps.validate.outputs.pr-body }}" == *"Emptyone"* ]]; then
-          echo "The text 'Empty' exists in the PR body."
-          exit 1
-          
-        else
-          echo "The text 'Empty file' does not exist in the PR body."
-          
-        fi
+        {
+        
+          if [[ "${{ steps.validate.outputs.pr-body }}" == *"Emptyone"* ]]; then
+            echo "The text 'Empty' exists in the PR body."
+            exit 1
+            
+          else
+            echo "The text 'Empty file' does not exist in the PR body."
+            
+          fi
         } || {
           echo "Bloc catch : Gestion de l'erreur."
         }
