@@ -198,7 +198,7 @@ jobs:
     - name: Create comment 
       uses: marocchino/sticky-pull-request-comment@v2
       with:
-        append: true
+        skip_unchanged: true
         GITHUB_TOKEN: ${{ secrets.TOCKEN_REGISTRY }}
         message: |
-            Release ${{ github.sha }} to <https://pr-${{ github.event.number }}.example.com>
+            Release ${{ github.sha }}1 to <https://pr-${{ github.event.number }}.example.com>
