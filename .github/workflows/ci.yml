@@ -50,7 +50,7 @@ jobs:
       uses: michelsadeu/compositeaction@v1.0.0
       with: 
         INPUT_VARIABLE: "Mon code" 
-    - name: Add file html
+    - name: Add html file
       id: htfile
       run: |
         summary="fichier.html"
