@@ -195,7 +195,7 @@ jobs:
           COMMENT_BODY="✅ All required checkboxes are checked!"
         fi
         gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT_BODY"
-    - name: Create comment here
+    - name: Create comment 
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         append: true
