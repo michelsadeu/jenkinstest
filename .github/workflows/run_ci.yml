@@ -1,0 +1,57 @@
+name: Run CI
+
+on:
+  workflow_call:
+    inputs:
+      pr_number:
+        description: 'Pull Request number'
+        required: true
+        type: number
+      message:
+        description: 'Message to post on PR'
+        required: false
+        type: string
+        default: 'CI workflow completed successfully'
+    secrets:
+      github_token:
+        description: 'GitHub token for API access'
+        required: true
+  
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request number'
+        required: true
+        type: number
+      message:
+        description: 'Message to post on PR'
+        required: false
+        type: string
+        default: 'CI workflow completed successfully'
+
+jobs:
+  run-ci:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run CI tasks
+        run: |
+          echo "Running CI tasks..."
+          echo "PR Number: ${{ inputs.pr_number }}"
+          echo "Message: ${{ inputs.message }}"
+      
+      - name: Post comment on PR
+        if: inputs.pr_number != 0
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.github_token || secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ inputs.pr_number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '${{ inputs.message }}'
+            })
