@@ -13,7 +13,7 @@ on:
         type: string
         default: 'CI workflow completed successfully'
     secrets:
-      github_token:
+      gh_token:
         description: 'GitHub token for API access'
         required: true
   
@@ -50,7 +50,7 @@ jobs:
         if: inputs.pr_number != 0
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.github_token || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.gh_token || secrets.GITHUB_TOKEN }}
           script: |
             github.rest.issues.createComment({
               issue_number: ${{ inputs.pr_number }},
