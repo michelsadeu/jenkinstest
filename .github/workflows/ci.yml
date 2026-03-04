@@ -17,6 +17,7 @@ jobs:
         C: ${{ github.event.pull_request.number }}
         D: ${{ github.event.pull_request.state }}
         E: ${{ github.event.pull_request.title }}
+        GITHUB_EVENT_PATH: ${{ github.event_path }}
     steps:
     - uses: actions/checkout@master
     - name: copy file
@@ -44,10 +45,21 @@ jobs:
         echo $GITHUB_BASE_REF
       
     # Ajoutez un fichier README.md au dépôt
-    - name: Add README.md
+    - name: Call composite action from another repo
+      id: composit-id
+      uses: michelsadeu/compositeaction@v1.0.0
+      with: 
+        INPUT_VARIABLE: "Mon code" 
+    - name: Add html file
+      id: htfile
       run: |
-        echo "# Bienvenue dans ce projet" > README.md
-        echo "Ce fichier a été ajouté automatiquement via une GitHub Action." >> README.md    
+        summary="fichier.html"
+        echo "Empty file" >> $summary
+        echo "Emptyone oui chef" >> $summary 
+        echo "sumval=$summary" >> $GITHUB_OUTPUT
+    - name: Afficher le fichier
+      run: |
+        echo "Hello file <br> $(cat ${{ steps.htfile.outputs.sumval }})<br> Developper"
     
     # - name: Validate PR checkboxes
     #   id: checkboxes
@@ -111,21 +123,48 @@ jobs:
         mkdir -p $HOME/bin
         mv jq $HOME/bin/
         echo "$HOME/bin" >> $GITHUB_PATH
-    - name: Valider les cases cochées dans la description de la PR
-      id: validate
-      run: |
-        PR_BODY=$(jq -r '.pull_request.body' "$GITHUB_EVENT_PATH")
-        echo $PR_BODY
-        if echo "$PR_BODY" | grep -q '\- \[x\] Mon code'; then
-          echo "✅ All required checkboxes are checked!" 
-        else
-          echo "Erreur : Certaines cases de la checklist ne sont pas cochées."
-          exit 1
-          
-        fi
-      env:
-        GITHUB_EVENT_PATH: ${{ github.event_path }}
+    # - name: Valider les cases cochées dans la description de la PR
+    #   id: validate  
+    #   run: |
+    #     set -e  # Arrête le script en cas d'erreur (comme un try implicite)
 
+    #     # Fonction pour gérer les erreurs (équivalent de 'catch')
+    #     error_handler() {
+    #       echo "Une erreur est survenue lors de l'extraction du corps de la pull request."
+    #       echo "Vérifiez que le fichier GITHUB_EVENT_PATH est correct et contient les données attendues."
+    #       exit 1
+    #     }
+
+    #     # Attache le gestionnaire d'erreurs au script (trap agit comme 'catch')
+    #     trap 'error_handler' ERR
+
+    #     PR_BODY=$(jq -r '.pull_request.body' "${GITHUB_EVENT_PAT}")
+        
+    #     echo $PR_BODY
+    #     if echo "$PR_BODY" | grep -q '\- \[x\] Mon code'; then
+    #       echo "✅ All required checkboxes are checked!" 
+    #     else
+    #       echo "Erreur : Certaines cases de la checklist ne sont pas cochées."
+    #       exit 1 
+    #     fi
+    #     echo "pr-body<<EOF" >> $GITHUB_OUTPUT
+    #     echo "$PR_BODY" >> $GITHUB_OUTPUT
+    #     echo "EOF" >> $GITHUB_OUTPUT
+        
+        
+    # - name: Valider la description de la PR
+    #   run: |
+    #     echo "The PR Body is:"
+    #     echo "${{ steps.validate.outputs.pr-body }}"
+        
+    #     if [[ "${{ steps.validate.outputs.pr-body }}" == *"Emptyone"* ]]; then
+    #       echo "The text 'Empty' exists in the PR body."
+    #       exit 1
+          
+    #     else
+    #       echo "The text 'Empty file' does not exist in the PR body."
+          
+    #     fi
     - name: Cache node modules
       uses: actions/cache@v3
       env:
@@ -156,3 +195,10 @@ jobs:
           COMMENT_BODY="✅ All required checkboxes are checked!"
         fi
         gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT_BODY"
+    - name: Create comment 
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        hide_and_recreate: true
+        GITHUB_TOKEN: ${{ secrets.TOCKEN_REGISTRY }}
+        message: |
+            Release ${{ github.sha }}1 to <https://pr-${{ github.event.number }}.example.com>
